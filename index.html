@@ -7,217 +7,217 @@
     <style>
         /* CSSの内容をここに統合 */
         body { 
-    margin: 0; display: flex; justify-content: center; align-items: center; /* centerに変更して中央配置に */
-    height: 100vh; font-family: 'Inter', sans-serif; overflow: hidden;
-    transition: background 0.5s ease;
-}
-
-.calculator { 
-    width: 95%; max-width: 380px; padding: 15px; /* paddingを少し削る */
-    border-radius: 30px; 
-    transition: all 0.5s ease; 
-    display: flex; flex-direction: column;
-    /* 画面からはみ出さないための設定 */
-    max-height: 98vh; 
-    box-sizing: border-box;
-}
-        
-        #display { 
-            width: 100%; min-height: 100px; 
-            font-size: 50px; text-align: right; display: flex; align-items: center; justify-content: flex-end; 
-            margin-bottom: 15px; font-weight: 300; font-variant-numeric: tabular-nums;
-            white-space: nowrap; overflow: hidden; text-overflow: clip; 
-        }
-        
-        .buttons { 
-    display: grid; 
-    grid-template-columns: repeat(4, 1fr); 
-    gap: 10px; /* gapを少し狭くする */
-}
-
-button {
-    /* 縦横比を保ちつつ、古い機種では高さで担保 */
-    aspect-ratio: 1 / 1;
-    min-height: 50px; 
-    
-    /* 文字がはみ出さないための設定 */
-    font-size: 24px; 
-    line-height: 1; 
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    
-    /* 文字の折り返しを防ぐ */
-    white-space: nowrap; 
-    overflow: hidden;
-}
-        .mod-badge { display: inline-flex; align-items: center; justify-content: center; border-radius: 8px; padding: 2px 10px; margin: 0 8px; height: 36px; font-size: 20px; font-weight: bold; }
-
-        /* --- Theme: Glass --- */
-        body.theme-glass { background: #0f172a; position: relative; overflow: hidden; }
-        body.theme-glass::before, body.theme-glass::after {
-            content: ""; position: absolute; width: 500px; height: 500px; border-radius: 50%;
-            filter: blur(100px); z-index: -1; animation: move-glass 12s infinite alternate ease-in-out;
-        }
-        body.theme-glass::before { background: radial-gradient(circle, rgba(76,161,175,0.7) 0%, rgba(76,161,175,0) 70%); top: -10%; left: -10%; }
-        body.theme-glass::after { background: radial-gradient(circle, rgba(168,85,247,0.6) 0%, rgba(168,85,247,0) 70%); bottom: -10%; right: -10%; animation-delay: -5s; }
-        @keyframes move-glass {
-            0% { transform: translate(0, 0) scale(1); }
-            100% { transform: translate(100px, -50px) scale(1.1); }
-        }
-        .theme-glass .calculator { background: rgba(255,255,255,0.07); backdrop-filter: blur(30px) saturate(200%); border: 1px solid rgba(255,255,255,0.2); box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); }
-        .theme-glass #display { color: #ffffff; text-shadow: 0 0 20px rgba(255,255,255,0.3); }
-        .theme-glass button { background: rgba(255,255,255,0.1); color: #ffffff; border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; }
-        .theme-glass button:active { background: rgba(255,255,255,0.2); transform: scale(0.95); }
-        .theme-glass .operator { background: rgba(168,85,247,0.15); color: #d8b4fe; font-weight: bold; }
-        .theme-glass .mod-badge { background: linear-gradient(135deg, #a855f7, #7c3aed); color: #ffffff; }
-
-        /* --- Theme: Soft UI --- */
-        body.theme-soft { background-color: #e0d7c7; }
-        .theme-soft .calculator { background: #e0d7c7; padding: 20px; }
-        .theme-soft .buttons { gap: 12px; }
-        .theme-soft #display { color: #4a4a4a; box-shadow: inset 6px 6px 12px #b8b0a1, inset -6px -6px 12px #ffffff; border-radius: 20px; padding: 0 15px; margin-bottom: 25px; }
-        .theme-soft button { border-radius: 50%; /* 正円にならない場合は 20px 程度にするのが安全 */ background: #e0d7c7; color: #4a4a4a; border-radius: 50%; box-shadow: 6px 6px 12px #b8b0a1, -6px -6px 12px #ffffff; margin: 0; font-size: 32px; width: 100%; }
-        .theme-soft button:active { box-shadow: inset 4px 4px 8px #b8b0a1, inset -4px -4px 8px #ffffff; transform: scale(0.94); }
-        .theme-soft .operator { color: #5d7a8c; font-size: 36px; font-weight: bold; }
-        .theme-soft .mod-badge { background: #5d7a8c; color: white; }
-
-        /* --- Theme: Cyber --- */
-        body.theme-cyber { background-color: #050505; }
-        .theme-cyber .calculator { background: #000; border: 2px solid #0ff; box-shadow: 0 0 20px #0ff; }
-        .theme-cyber #display { color: #0ff; text-shadow: 0 0 10px #0ff; font-family: 'Courier New', monospace; }
-        .theme-cyber button { background: #111; color: #0ff; border: 1px solid #0ff; border-radius: 5px; text-shadow: 0 0 5px #0ff; }
-        .theme-cyber .operator { color: #f0f; border-color: #f0f; }
-        .theme-cyber .mod-badge { border: 1px solid #f0f; color: #f0f; }
-    </style>
-</head>
-<body class="theme-glass">
-
-    <div class="calculator">
-        <div id="display">0</div>
-        <div class="buttons">
-            <button class="special" onclick="clearDisplay()">AC</button>
-            <button class="special" onclick="undo()">⤺</button>
-            <button class="special" onclick="redo()">⤻</button>
-            <button class="operator" onclick="appendOperator('余り')">余</button>
-            
-            <button onclick="appendNumber('7')">7</button>
-            <button onclick="appendNumber('8')">8</button>
-            <button onclick="appendNumber('9')">9</button>
-            <button class="operator" onclick="appendOperator('×')">×</button>
-            
-            <button onclick="appendNumber('4')">4</button>
-            <button onclick="appendNumber('5')">5</button>
-            <button onclick="appendNumber('6')">6</button>
-            <button class="operator" onclick="appendOperator('−')">−</button>
-            
-            <button onclick="appendNumber('1')">1</button>
-            <button onclick="appendNumber('2')">2</button>
-            <button onclick="appendNumber('3')">3</button>
-            <button class="operator" onclick="appendOperator('+')">+</button>
-            
-            <button class="special" onclick="toggleTheme()">🎨</button>
-            <button onclick="appendNumber('0')">0</button>
-            <button onclick="appendNumber('.')">.</button>
-            <button class="operator" onclick="calculate()">=</button>
-        </div>
-    </div>
-
-    <script>
-        /* JSの内容をここに統合する */
-        const display = document.getElementById('display');
-        let rawInput = "0", history = ["0"], historyStep = 0, shouldReset = false;
-        const themes = ['glass', 'soft', 'cyber'];
-
-        window.onload = function() {
-            const savedTheme = localStorage.getItem('user_calc_theme');
-            if (savedTheme && themes.includes(savedTheme)) {
-                document.body.className = 'theme-' + savedTheme;
-            }
-        };
-
-        function toggleTheme() {
-            let currentTheme = document.body.className.replace('theme-', '');
-            let nextIndex = (themes.indexOf(currentTheme) + 1) % themes.length;
-            let nextTheme = themes[nextIndex];
-            document.body.className = 'theme-' + nextTheme;
-            localStorage.setItem('user_calc_theme', nextTheme);
+            margin: 0; display: flex; justify-content: center; align-items: center; /* centerに変更して中央配置に */
+            height: 100vh; font-family: 'Inter', sans-serif; overflow: hidden;
+            transition: background 0.5s ease;
         }
 
-        function formatNumbers(str) {
-            return str.replace(/(\d+)(\.\d+)?/g, (match, p1, p2) => {
-                let integerPart = p1.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-                return p2 ? integerPart + p2 : integerPart;
-            });
+        .calculator { 
+            width: 95%; max-width: 380px; padding: 15px; /* paddingを少し削る */
+            border-radius: 30px; 
+            transition: all 0.5s ease; 
+            display: flex; flex-direction: column;
+            /* 画面からはみ出さないための設定 */
+            max-height: 98vh; 
+            box-sizing: border-box;
         }
-
-        function updateDisplay() {
-            let formattedText = formatNumbers(rawInput);
-            let len = formattedText.length;
-            if (len > 16) display.style.fontSize = "22px";
-            else if (len > 12) display.style.fontSize = "30px";
-            else if (len > 8) display.style.fontSize = "40px";
-            else display.style.fontSize = "50px";
-
-            display.innerHTML = formattedText.replace(/余り/g, '<span class="mod-badge">余り</span>');
-        }
-
-        function saveHistory() {
-            if (history[historyStep] === rawInput) return;
-            history = history.slice(0, historyStep + 1);
-            history.push(rawInput);
-            historyStep++;
-        }
-
-        function appendNumber(num) {
-            if (shouldReset) {
-                rawInput = (num === '.') ? '0.' : num;
-                shouldReset = false;
-            } else {
-                if (num === '.') {
-                    let parts = rawInput.split(/[+−×余り]/);
-                    if (parts[parts.length - 1].includes('.')) return;
-                    rawInput += '.';
-                } else {
-                    rawInput = (rawInput === '0') ? num : rawInput + num;
+                
+                #display { 
+                    width: 100%; min-height: 100px; 
+                    font-size: 50px; text-align: right; display: flex; align-items: center; justify-content: flex-end; 
+                    margin-bottom: 15px; font-weight: 300; font-variant-numeric: tabular-nums;
+                    white-space: nowrap; overflow: hidden; text-overflow: clip; 
                 }
-            }
-            saveHistory(); updateDisplay();
+                
+                .buttons { 
+            display: grid; 
+            grid-template-columns: repeat(4, 1fr); 
+            gap: 10px; /* gapを少し狭くする */
         }
 
-        function appendOperator(op) {
-            shouldReset = false;
-            if (rawInput.includes(' あまり ')) {
-                let parts = rawInput.split(' あまり ');
-                rawInput = parts[1].replace(/,/g, ''); 
-            }
-            const ops = ['+', '−', '×', '余り'];
-            let lastLen = rawInput.endsWith('余り') ? 2 : (ops.includes(rawInput.slice(-1)) ? 1 : 0);
-            if (lastLen > 0) {
-                rawInput = rawInput.slice(0, -lastLen) + op;
-            } else {
-                rawInput += op;
-            }
-            saveHistory(); updateDisplay();
+        button {
+            /* 縦横比を保ちつつ、古い機種では高さで担保 */
+            aspect-ratio: 1 / 1;
+            min-height: 50px; 
+            
+            /* 文字がはみ出さないための設定 */
+            font-size: 24px; 
+            line-height: 1; 
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            
+            /* 文字の折り返しを防ぐ */
+            white-space: nowrap; 
+            overflow: hidden;
         }
+                .mod-badge { display: inline-flex; align-items: center; justify-content: center; border-radius: 8px; padding: 2px 10px; margin: 0 8px; height: 36px; font-size: 20px; font-weight: bold; }
 
-        function calculate() {
-            try {
-                let res = "";
-                if (rawInput.includes('余り')) {
-                    let parts = rawInput.split('余り');
-                    let a = Function('return ' + parts[0].replace(/×/g, '*').replace(/−/g, '-'))();
-                    let b = Function('return ' + parts[1].replace(/×/g, '*').replace(/−/g, '-'))();
-                    if (b === 0) {
-                        res = "Error";
-                    } else {
-                        let quotient = Math.trunc(a / b); 
-                        let remainder = a % b;
-                        const roundTo2 = (num) => Math.round(num * 100) / 100;
-                        res = quotient + " あまり " + roundTo2(remainder);
+                /* --- Theme: Glass --- */
+                body.theme-glass { background: #0f172a; position: relative; overflow: hidden; }
+                body.theme-glass::before, body.theme-glass::after {
+                    content: ""; position: absolute; width: 500px; height: 500px; border-radius: 50%;
+                    filter: blur(100px); z-index: -1; animation: move-glass 12s infinite alternate ease-in-out;
+                }
+                body.theme-glass::before { background: radial-gradient(circle, rgba(76,161,175,0.7) 0%, rgba(76,161,175,0) 70%); top: -10%; left: -10%; }
+                body.theme-glass::after { background: radial-gradient(circle, rgba(168,85,247,0.6) 0%, rgba(168,85,247,0) 70%); bottom: -10%; right: -10%; animation-delay: -5s; }
+                @keyframes move-glass {
+                    0% { transform: translate(0, 0) scale(1); }
+                    100% { transform: translate(100px, -50px) scale(1.1); }
+                }
+                .theme-glass .calculator { background: rgba(255,255,255,0.07); backdrop-filter: blur(30px) saturate(200%); border: 1px solid rgba(255,255,255,0.2); box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); }
+                .theme-glass #display { color: #ffffff; text-shadow: 0 0 20px rgba(255,255,255,0.3); }
+                .theme-glass button { background: rgba(255,255,255,0.1); color: #ffffff; border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; }
+                .theme-glass button:active { background: rgba(255,255,255,0.2); transform: scale(0.95); }
+                .theme-glass .operator { background: rgba(168,85,247,0.15); color: #d8b4fe; font-weight: bold; }
+                .theme-glass .mod-badge { background: linear-gradient(135deg, #a855f7, #7c3aed); color: #ffffff; }
+
+                /* --- Theme: Soft UI --- */
+                body.theme-soft { background-color: #e0d7c7; }
+                .theme-soft .calculator { background: #e0d7c7; padding: 20px; }
+                .theme-soft .buttons { gap: 12px; }
+                .theme-soft #display { color: #4a4a4a; box-shadow: inset 6px 6px 12px #b8b0a1, inset -6px -6px 12px #ffffff; border-radius: 20px; padding: 0 15px; margin-bottom: 25px; }
+                .theme-soft button { border-radius: 50%; /* 正円にならない場合は 20px 程度にするのが安全 */ background: #e0d7c7; color: #4a4a4a; border-radius: 50%; box-shadow: 6px 6px 12px #b8b0a1, -6px -6px 12px #ffffff; margin: 0; font-size: 32px; width: 100%; }
+                .theme-soft button:active { box-shadow: inset 4px 4px 8px #b8b0a1, inset -4px -4px 8px #ffffff; transform: scale(0.94); }
+                .theme-soft .operator { color: #5d7a8c; font-size: 36px; font-weight: bold; }
+                .theme-soft .mod-badge { background: #5d7a8c; color: white; }
+
+                /* --- Theme: Cyber --- */
+                body.theme-cyber { background-color: #050505; }
+                .theme-cyber .calculator { background: #000; border: 2px solid #0ff; box-shadow: 0 0 20px #0ff; }
+                .theme-cyber #display { color: #0ff; text-shadow: 0 0 10px #0ff; font-family: 'Courier New', monospace; }
+                .theme-cyber button { background: #111; color: #0ff; border: 1px solid #0ff; border-radius: 5px; text-shadow: 0 0 5px #0ff; }
+                .theme-cyber .operator { color: #f0f; border-color: #f0f; }
+                .theme-cyber .mod-badge { border: 1px solid #f0f; color: #f0f; }
+            </style>
+        </head>
+        <body class="theme-glass">
+
+            <div class="calculator">
+                <div id="display">0</div>
+                <div class="buttons">
+                    <button class="special" onclick="clearDisplay()">AC</button>
+                    <button class="special" onclick="undo()">⤺</button>
+                    <button class="special" onclick="redo()">⤻</button>
+                    <button class="operator" onclick="appendOperator('余り')">余</button>
+                    
+                    <button onclick="appendNumber('7')">7</button>
+                    <button onclick="appendNumber('8')">8</button>
+                    <button onclick="appendNumber('9')">9</button>
+                    <button class="operator" onclick="appendOperator('×')">×</button>
+                    
+                    <button onclick="appendNumber('4')">4</button>
+                    <button onclick="appendNumber('5')">5</button>
+                    <button onclick="appendNumber('6')">6</button>
+                    <button class="operator" onclick="appendOperator('−')">−</button>
+                    
+                    <button onclick="appendNumber('1')">1</button>
+                    <button onclick="appendNumber('2')">2</button>
+                    <button onclick="appendNumber('3')">3</button>
+                    <button class="operator" onclick="appendOperator('+')">+</button>
+                    
+                    <button class="special" onclick="toggleTheme()">🎨</button>
+                    <button onclick="appendNumber('0')">0</button>
+                    <button onclick="appendNumber('.')">.</button>
+                    <button class="operator" onclick="calculate()">=</button>
+                </div>
+            </div>
+
+            <script>
+                /* JSの内容をここに統合する */
+                const display = document.getElementById('display');
+                let rawInput = "0", history = ["0"], historyStep = 0, shouldReset = false;
+                const themes = ['glass', 'soft', 'cyber'];
+
+                window.onload = function() {
+                    const savedTheme = localStorage.getItem('user_calc_theme');
+                    if (savedTheme && themes.includes(savedTheme)) {
+                        document.body.className = 'theme-' + savedTheme;
                     }
-                } else {
-                    let exp = rawInput.replace(/×/g, '*').replace(/−/g, '-');
+                };
+
+                function toggleTheme() {
+                    let currentTheme = document.body.className.replace('theme-', '');
+                    let nextIndex = (themes.indexOf(currentTheme) + 1) % themes.length;
+                    let nextTheme = themes[nextIndex];
+                    document.body.className = 'theme-' + nextTheme;
+                    localStorage.setItem('user_calc_theme', nextTheme);
+                }
+
+                function formatNumbers(str) {
+                    return str.replace(/(\d+)(\.\d+)?/g, (match, p1, p2) => {
+                        let integerPart = p1.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+                        return p2 ? integerPart + p2 : integerPart;
+                    });
+                }
+
+                function updateDisplay() {
+                    let formattedText = formatNumbers(rawInput);
+                    let len = formattedText.length;
+                    if (len > 16) display.style.fontSize = "22px";
+                    else if (len > 12) display.style.fontSize = "30px";
+                    else if (len > 8) display.style.fontSize = "40px";
+                    else display.style.fontSize = "50px";
+
+                    display.innerHTML = formattedText.replace(/余り/g, '<span class="mod-badge">余り</span>');
+                }
+
+                function saveHistory() {
+                    if (history[historyStep] === rawInput) return;
+                    history = history.slice(0, historyStep + 1);
+                    history.push(rawInput);
+                    historyStep++;
+                }
+
+                function appendNumber(num) {
+                    if (shouldReset) {
+                        rawInput = (num === '.') ? '0.' : num;
+                        shouldReset = false;
+                    } else {
+                        if (num === '.') {
+                            let parts = rawInput.split(/[+−×余り]/);
+                            if (parts[parts.length - 1].includes('.')) return;
+                            rawInput += '.';
+                        } else {
+                            rawInput = (rawInput === '0') ? num : rawInput + num;
+                        }
+                    }
+                    saveHistory(); updateDisplay();
+                }
+
+                function appendOperator(op) {
+                    shouldReset = false;
+                    if (rawInput.includes(' あまり ')) {
+                        let parts = rawInput.split(' あまり ');
+                        rawInput = parts[1].replace(/,/g, ''); 
+                    }
+                    const ops = ['+', '−', '×', '余り'];
+                    let lastLen = rawInput.endsWith('余り') ? 2 : (ops.includes(rawInput.slice(-1)) ? 1 : 0);
+                    if (lastLen > 0) {
+                        rawInput = rawInput.slice(0, -lastLen) + op;
+                    } else {
+                        rawInput += op;
+                    }
+                    saveHistory(); updateDisplay();
+                }
+
+                function calculate() {
+                    try {
+                        let res = "";
+                        if (rawInput.includes('余り')) {
+                            let parts = rawInput.split('余り');
+                            let a = Function('return ' + parts[0].replace(/×/g, '*').replace(/−/g, '-'))();
+                            let b = Function('return ' + parts[1].replace(/×/g, '*').replace(/−/g, '-'))();
+                            if (b === 0) {
+                                res = "Error";
+                            } else {
+                                let quotient = Math.trunc(a / b); 
+                                let remainder = a % b;
+                                const roundTo2 = (num) => Math.round(num * 100) / 100;
+                                res = quotient + " あまり " + roundTo2(remainder);
+                            }
+                        } else {
+                            let exp = rawInput.replace(/×/g, '*').replace(/−/g, '-');
                     let val = Function('return ' + exp)();
                     if (!isFinite(val)) {
                         res = "Error";
