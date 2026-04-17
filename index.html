@@ -7,15 +7,20 @@
     <style>
         /* CSSの内容をここに統合 */
         body { 
-            margin: 0; display: flex; justify-content: center; align-items: flex-end; 
-            height: 100vh; font-family: 'Inter', sans-serif; overflow: hidden;
-            transition: background 0.5s ease;
-        }
-        .calculator { 
-            width: 95%; max-width: 380px; padding: 25px; border-radius: 40px; 
-            transition: all 0.5s ease; margin-bottom: 50px; max-height: 90vh;
-            display: flex; flex-direction: column;
-        }
+    margin: 0; display: flex; justify-content: center; align-items: center; /* centerに変更して中央配置に */
+    height: 100vh; font-family: 'Inter', sans-serif; overflow: hidden;
+    transition: background 0.5s ease;
+}
+
+.calculator { 
+    width: 95%; max-width: 380px; padding: 15px; /* paddingを少し削る */
+    border-radius: 30px; 
+    transition: all 0.5s ease; 
+    display: flex; flex-direction: column;
+    /* 画面からはみ出さないための設定 */
+    max-height: 98vh; 
+    box-sizing: border-box;
+}
         
         #display { 
             width: 100%; min-height: 100px; 
@@ -24,8 +29,28 @@
             white-space: nowrap; overflow: hidden; text-overflow: clip; 
         }
         
-        .buttons { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
-        button { aspect-ratio: 1 / 1; border: none; font-size: 28px; cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; justify-content: center; touch-action: manipulation; }
+        .buttons { 
+    display: grid; 
+    grid-template-columns: repeat(4, 1fr); 
+    gap: 10px; /* gapを少し狭くする */
+}
+
+button {
+    /* 縦横比を保ちつつ、古い機種では高さで担保 */
+    aspect-ratio: 1 / 1;
+    min-height: 50px; 
+    
+    /* 文字がはみ出さないための設定 */
+    font-size: 24px; 
+    line-height: 1; 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    /* 文字の折り返しを防ぐ */
+    white-space: nowrap; 
+    overflow: hidden;
+}
         .mod-badge { display: inline-flex; align-items: center; justify-content: center; border-radius: 8px; padding: 2px 10px; margin: 0 8px; height: 36px; font-size: 20px; font-weight: bold; }
 
         /* --- Theme: Glass --- */
@@ -52,7 +77,7 @@
         .theme-soft .calculator { background: #e0d7c7; padding: 20px; }
         .theme-soft .buttons { gap: 12px; }
         .theme-soft #display { color: #4a4a4a; box-shadow: inset 6px 6px 12px #b8b0a1, inset -6px -6px 12px #ffffff; border-radius: 20px; padding: 0 15px; margin-bottom: 25px; }
-        .theme-soft button { background: #e0d7c7; color: #4a4a4a; border-radius: 50%; box-shadow: 6px 6px 12px #b8b0a1, -6px -6px 12px #ffffff; margin: 0; font-size: 32px; width: 100%; }
+        .theme-soft button { border-radius: 50%; /* 正円にならない場合は 20px 程度にするのが安全 */ background: #e0d7c7; color: #4a4a4a; border-radius: 50%; box-shadow: 6px 6px 12px #b8b0a1, -6px -6px 12px #ffffff; margin: 0; font-size: 32px; width: 100%; }
         .theme-soft button:active { box-shadow: inset 4px 4px 8px #b8b0a1, inset -4px -4px 8px #ffffff; transform: scale(0.94); }
         .theme-soft .operator { color: #5d7a8c; font-size: 36px; font-weight: bold; }
         .theme-soft .mod-badge { background: #5d7a8c; color: white; }
