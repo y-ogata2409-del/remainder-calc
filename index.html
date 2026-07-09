@@ -267,8 +267,9 @@
 
         function appendOperator(op) {
             shouldReset = false;
-            if (rawInput.includes(' あまり ')) {
-                let parts = rawInput.split(' あまり ');
+            // 3. 判定文字を「余り（漢字）」に統一
+            if (rawInput.includes(' 余り ')) {
+                let parts = rawInput.split(' 余り ');
                 rawInput = parts[1].replace(/,/g, ''); 
             }
             const ops = ['+', '−', '×', '余り'];
@@ -281,6 +282,13 @@
             saveHistory(); updateDisplay();
         }
 
+        // 小数の桁数を取得するヘルパー関数
+        function getDecimalPlaces(num) {
+            const match = ('' + num).match(/(?:\.(\d+))?(?:[eE]([+-]?\d+))?$/);
+            if (!match) return 0;
+            return Math.max(0, (match[1] ? match[1].length : 0) - (match[2] ? +match[2] : 0));
+        }
+        
         function calculate() {
             try {
                 let res = "";
@@ -288,13 +296,28 @@
                     let parts = rawInput.split('余り');
                     let a = Function('return ' + parts[0].replace(/×/g, '*').replace(/−/g, '-'))();
                     let b = Function('return ' + parts[1].replace(/×/g, '*').replace(/−/g, '-'))();
+                    
                     if (b === 0) {
                         res = "Error";
                     } else {
-                        let quotient = Math.trunc(a / b); 
-                        let remainder = a % b;
-                        const roundTo2 = (num) => Math.round(num * 100) / 100;
-                        res = quotient + " あまり " + roundTo2(remainder);
+                        // 1. 浮動小数点数誤差対策：整数に変換して計算する
+                        const aPlaces = getDecimalPlaces(a);
+                        const bPlaces = getDecimalPlaces(b);
+                        const maxPlaces = Math.max(aPlaces, bPlaces);
+                        const factor = Math.pow(10, maxPlaces);
+        
+                        // 整数化した値で商と余りを計算
+                        const intA = Math.round(a * factor);
+                        const intB = Math.round(b * factor);
+        
+                        let quotient = Math.trunc(intA / intB); 
+                        let remainder = (intA % intB) / factor; // 元のスケールに戻す
+        
+                        // 表示用に綺麗に整形（誤差を完全に排除）
+                        let fixedRemainder = parseFloat(remainder.toFixed(maxPlaces));
+        
+                        // 2. 次の計算に備え、内部保持は「余り（漢字）」に統一する
+                        res = quotient + " 余り " + fixedRemainder;
                     }
                 } else {
                     let exp = rawInput.replace(/×/g, '*').replace(/−/g, '-');
