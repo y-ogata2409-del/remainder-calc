@@ -238,7 +238,8 @@
             else if (len > 12) display.style.fontSize = "30px";
             else if (len > 8) display.style.fontSize = "40px";
             else display.style.fontSize = "50px";
-
+        
+            // 漢字の「余り」（計算途中）だけをバッジ化し、ひらがなの「あまり」（結果）はそのまま表示
             display.innerHTML = formattedText.replace(/余り/g, '<span class="mod-badge">余り</span>');
         }
 
@@ -267,9 +268,9 @@
 
         function appendOperator(op) {
             shouldReset = false;
-            // 3. 判定文字を「余り（漢字）」に統一
-            if (rawInput.includes(' 余り ')) {
-                let parts = rawInput.split(' 余り ');
+            // 【ここを修正】答えが「あまり」で表示されている状態で、次の演算子が押されたら右側の数値（余り）を引き継ぐ
+            if (rawInput.includes(' あまり ')) {
+                let parts = rawInput.split(' あまり ');
                 rawInput = parts[1].replace(/,/g, ''); 
             }
             const ops = ['+', '−', '×', '余り'];
@@ -300,24 +301,22 @@
                     if (b === 0) {
                         res = "Error";
                     } else {
-                        // 1. 浮動小数点数誤差対策：整数に変換して計算する
+                        // 小数第2位などの計算誤差を排除するロジック
                         const aPlaces = getDecimalPlaces(a);
                         const bPlaces = getDecimalPlaces(b);
                         const maxPlaces = Math.max(aPlaces, bPlaces);
                         const factor = Math.pow(10, maxPlaces);
         
-                        // 整数化した値で商と余りを計算
                         const intA = Math.round(a * factor);
                         const intB = Math.round(b * factor);
         
                         let quotient = Math.trunc(intA / intB); 
-                        let remainder = (intA % intB) / factor; // 元のスケールに戻す
+                        let remainder = (intA % intB) / factor; 
         
-                        // 表示用に綺麗に整形（誤差を完全に排除）
                         let fixedRemainder = parseFloat(remainder.toFixed(maxPlaces));
         
-                        // 2. 次の計算に備え、内部保持は「余り（漢字）」に統一する
-                        res = quotient + " 余り " + fixedRemainder;
+                        // 【ここを修正】答えの表示には分かりやすい「あまり」を採用
+                        res = quotient + " あまり " + fixedRemainder;
                     }
                 } else {
                     let exp = rawInput.replace(/×/g, '*').replace(/−/g, '-');
